@@ -104,4 +104,4 @@ aws cloudformation describe-stacks \
   --stack-name "$STACK_NAME" \
   --region "$AWS_REGION" \
   --query 'Stacks[0].Outputs' \
-  --output table
+  --output json
