@@ -14,7 +14,7 @@ aws configure
 
 # GitHub raw URL to the CloudFormation template.
 #TEMPLATE_URL="${TEMPLATE_URL:-https://raw.githubusercontent.com/ORG/REPO/main/cloudformation/template.yaml}"
-TEMPLATE_URL="${TEMPLATE_URL:-https://raw.githubusercontent.com/sisayie/aws-course/refs/heads/main/cloudformation/ml-stack-lambda.yml}"
+TEMPLATE_URL="${TEMPLATE_URL:-https://raw.githubusercontent.com/sisayie/aws-course/refs/heads/main/cloudformation/exam-score-ml-stack_v3.yml}"
 
 # Optional CloudFormation parameters.
 PARAMETERS=(
@@ -104,4 +104,4 @@ aws cloudformation describe-stacks \
   --stack-name "$STACK_NAME" \
   --region "$AWS_REGION" \
   --query 'Stacks[0].Outputs' \
-  --output json
+  --output table
