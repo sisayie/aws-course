@@ -1,0 +1,456 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: >
+  Example event-driven SageMaker Processing pipeline.
+  An object uploaded to S3/incoming triggers Lambda, which
+  starts a SageMaker Processing Job. The job preprocesses
+  the data and writes the result to S3/processed.
+
+Parameters:
+
+  ProcessingInstanceType:
+    Type: String
+    Default: ml.t3.medium
+    Description: SageMaker Processing instance type
+
+  ProcessingVolumeSize:
+    Type: Number
+    Default: 20
+    Description: EBS volume size in GB for the processing job
+
+  ProcessingMaxRuntime:
+    Type: Number
+    Default: 3600
+    Description: Maximum processing runtime in seconds
+
+Resources:
+
+  ############################################################
+  # S3 BUCKET
+  ############################################################
+
+  DataBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+      LifecycleConfiguration:
+        Rules:
+          - Id: ExpireProcessedData
+            Status: Enabled
+            Prefix: processed/
+            ExpirationInDays: 30
+
+
+  ############################################################
+  # IAM ROLE USED BY SAGEMAKER
+  ############################################################
+
+  SageMakerExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Role used by SageMaker Processing Jobs
+
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - sagemaker.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+      Policies:
+
+        - PolicyName: S3ProcessingAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+
+              # Read input data
+              - Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                Resource:
+                  - !Sub '${DataBucket.Arn}/incoming/*'
+
+              # List bucket
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  - !GetAtt DataBucket.Arn
+                Condition:
+                  StringLike:
+                    s3:prefix:
+                      - incoming/*
+                      - processed/*
+
+              # Write processed data
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                Resource:
+                  - !Sub '${DataBucket.Arn}/processed/*'
+
+
+  ############################################################
+  # IAM ROLE USED BY LAMBDA
+  ############################################################
+
+  ProcessingLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Role used by Lambda to start SageMaker Processing Jobs
+
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+
+      Policies:
+
+        - PolicyName: LambdaLogging
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                Resource: '*'
+
+        - PolicyName: StartSageMakerProcessing
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+
+              - Effect: Allow
+                Action:
+                  - sagemaker:CreateProcessingJob
+                Resource: '*'
+
+              - Effect: Allow
+                Action:
+                  - iam:PassRole
+                Resource:
+                  - !GetAtt SageMakerExecutionRole.Arn
+
+
+  ############################################################
+  # LAMBDA FUNCTION
+  ############################################################
+
+  ProcessingLambda:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: Starts a SageMaker Processing Job when data arrives in S3
+      Runtime: python3.12
+      Handler: index.handler
+      Timeout: 60
+      MemorySize: 256
+
+      Role: !GetAtt ProcessingLambdaRole.Arn
+
+      Environment:
+        Variables:
+          PROCESSING_ROLE_ARN: !GetAtt SageMakerExecutionRole.Arn
+          PROCESSING_IMAGE: !Sub
+            '${AWS::AccountId}.dkr.ecr.${AWS::Region}.amazonaws.com/sagemaker-scikit-learn:1.4-1-cpu-py3'
+          PROCESSING_INSTANCE_TYPE: !Ref ProcessingInstanceType
+          PROCESSING_VOLUME_SIZE: !Ref ProcessingVolumeSize
+          PROCESSING_MAX_RUNTIME: !Ref ProcessingMaxRuntime
+          OUTPUT_BUCKET: !Ref DataBucket
+
+      Code:
+        ZipFile: |
+          import os
+          import urllib.parse
+          import boto3
+          import re
+          import logging
+
+          logger = logging.getLogger()
+          logger.setLevel(logging.INFO)
+
+          sagemaker = boto3.client("sagemaker")
+
+          ROLE_ARN = os.environ["PROCESSING_ROLE_ARN"]
+          PROCESSING_IMAGE = os.environ["PROCESSING_IMAGE"]
+          INSTANCE_TYPE = os.environ["PROCESSING_INSTANCE_TYPE"]
+          VOLUME_SIZE = int(os.environ["PROCESSING_VOLUME_SIZE"])
+          MAX_RUNTIME = int(os.environ["PROCESSING_MAX_RUNTIME"])
+          OUTPUT_BUCKET = os.environ["OUTPUT_BUCKET"]
+
+
+          def sanitize_job_name(value):
+              """
+              Convert an S3 object key into a valid SageMaker
+              Processing Job name.
+              """
+              value = re.sub(r"[^a-zA-Z0-9-]", "-", value)
+              value = re.sub(r"-+", "-", value)
+              value = value.strip("-")
+
+              if not value:
+                  value = "processing"
+
+              return value[:50]
+
+
+          def handler(event, context):
+
+              logger.info("Received event: %s", event)
+
+              for record in event.get("Records", []):
+
+                  # EventBridge S3 events have a different structure
+                  # than legacy S3 notification events.
+                  detail = record.get("detail", {})
+
+                  bucket_name = detail.get("bucket", {}).get("name")
+                  object_key = detail.get("object", {}).get("key")
+
+                  if not bucket_name or not object_key:
+                      logger.warning(
+                          "Could not find bucket/key in event: %s",
+                          record
+                      )
+                      continue
+
+                  object_key = urllib.parse.unquote_plus(object_key)
+
+                  logger.info(
+                      "Processing s3://%s/%s",
+                      bucket_name,
+                      object_key
+                  )
+
+                  # Ignore anything outside incoming/
+                  if not object_key.startswith("incoming/"):
+                      logger.info(
+                          "Ignoring object outside incoming/: %s",
+                          object_key
+                      )
+                      continue
+
+                  # Create a deterministic-ish job name.
+                  context_id = context.aws_request_id[:8]
+
+                  base_name = sanitize_job_name(
+                      object_key.replace("/", "-")
+                  )
+
+                  job_name = (
+                      f"s3-preprocess-{base_name}-{context_id}"
+                  )[:63]
+
+                  input_uri = f"s3://{bucket_name}/{object_key}"
+
+                  output_uri = (
+                      f"s3://{OUTPUT_BUCKET}/processed/"
+                  )
+
+                  logger.info(
+                      "Starting SageMaker Processing Job %s",
+                      job_name
+                  )
+
+                  response = sagemaker.create_processing_job(
+
+                      ProcessingJobName=job_name,
+
+                      RoleArn=ROLE_ARN,
+
+                      AppSpecification={
+                          "ImageUri": PROCESSING_IMAGE,
+                          "ContainerEntrypoint": [
+                              "python3",
+                              "/opt/ml/processing/code/preprocess.py"
+                          ]
+                      },
+
+                      ProcessingInputs=[
+                          {
+                              "InputName": "input",
+
+                              "S3Input": {
+                                  "S3Uri": input_uri,
+                                  "LocalPath": "/opt/ml/processing/input",
+                                  "S3DataType": "S3Prefix",
+                                  "S3InputMode": "File",
+                                  "S3DataDistributionType": "FullyReplicated",
+                                  "S3CompressionType": "None"
+                              }
+                          },
+                          {
+                              "InputName": "code",
+
+                              "S3Input": {
+                                  "S3Uri": (
+                                      f"s3://{bucket_name}/code/"
+                                  ),
+                                  "LocalPath": "/opt/ml/processing/code",
+                                  "S3DataType": "S3Prefix",
+                                  "S3InputMode": "File",
+                                  "S3DataDistributionType": "FullyReplicated",
+                                  "S3CompressionType": "None"
+                              }
+                          }
+                      ],
+
+                      ProcessingOutputConfig={
+                          "Outputs": [
+                              {
+                                  "OutputName": "processed-data",
+
+                                  "S3Output": {
+                                      "S3Uri": output_uri,
+                                      "LocalPath": "/opt/ml/processing/output",
+                                      "S3UploadMode": "EndOfJob"
+                                  }
+                              }
+                          ]
+                      },
+
+                      ProcessingResources={
+                          "ClusterConfig": {
+                              "InstanceCount": 1,
+                              "InstanceType": INSTANCE_TYPE,
+                              "VolumeSizeInGB": VOLUME_SIZE
+                          }
+                      },
+
+                      StoppingCondition={
+                          "MaxRuntimeInSeconds": MAX_RUNTIME
+                      },
+
+                      Tags=[
+                          {
+                              "Key": "Pipeline",
+                              "Value": "s3-preprocessing"
+                          },
+                          {
+                              "Key": "SourceObject",
+                              "Value": object_key[:256]
+                          }
+                      ]
+                  )
+
+                  logger.info(
+                      "SageMaker response: %s",
+                      response
+                  )
+
+              return {
+                  "statusCode": 200
+              }
+
+
+  ############################################################
+  # CLOUDWATCH LOG GROUP FOR LAMBDA
+  ############################################################
+
+  ProcessingLambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ProcessingLambda}'
+      RetentionInDays: 14
+
+
+  ############################################################
+  # EVENTBRIDGE RULE
+  ############################################################
+
+  S3ObjectCreatedRule:
+    Type: AWS::Events::Rule
+    Properties:
+
+      Description: >
+        Starts SageMaker preprocessing when an object
+        is uploaded to the incoming/ S3 prefix.
+
+      EventPattern:
+        source:
+          - aws.s3
+
+        detail-type:
+          - Object Created
+
+        detail:
+          bucket:
+            name:
+              - !Ref DataBucket
+
+          object:
+            key:
+              - prefix: incoming/
+
+      State: ENABLED
+
+      Targets:
+        - Arn: !GetAtt ProcessingLambda.Arn
+          Id: ProcessingLambdaTarget
+
+
+  ############################################################
+  # ALLOW EVENTBRIDGE TO INVOKE LAMBDA
+  ############################################################
+
+  ProcessingLambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ProcessingLambda
+      Action: lambda:InvokeFunction
+      Principal: events.amazonaws.com
+      SourceArn: !GetAtt S3ObjectCreatedRule.Arn
+
+
+Outputs:
+
+  DataBucketName:
+    Description: S3 bucket used by the pipeline
+    Value: !Ref DataBucket
+
+  IncomingPrefix:
+    Description: Upload raw data here
+    Value: !Sub 's3://${DataBucket}/incoming/'
+
+  ProcessedPrefix:
+    Description: Processed data appears here
+    Value: !Sub 's3://${DataBucket}/processed/'
+
+  CodePrefix:
+    Description: Upload preprocess.py here
+    Value: !Sub 's3://${DataBucket}/code/'
+
+  LambdaFunction:
+    Description: Lambda function that starts SageMaker Processing
+    Value: !Ref ProcessingLambda
+
+  EventBridgeRule:
+    Description: EventBridge rule monitoring S3
+    Value: !Ref S3ObjectCreatedRule
+
+  SageMakerExecutionRole:
+    Description: SageMaker execution role
+    Value: !GetAtt SageMakerExecutionRole.Arn
