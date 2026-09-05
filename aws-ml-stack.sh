@@ -13,8 +13,8 @@ STACK_NAME="${STACK_NAME:-ml-stack}"
 aws configure 
 
 # GitHub raw URL to the CloudFormation template.
-TEMPLATE_URL="${TEMPLATE_URL:-https://raw.githubusercontent.com/ORG/REPO/main/cloudformation/template.yaml}"
-
+#TEMPLATE_URL="${TEMPLATE_URL:-https://raw.githubusercontent.com/ORG/REPO/main/cloudformation/template.yaml}"
+TEMPLATE_URL="${https://raw.githubusercontent.com/sisayie/aws-course/refs/heads/main/cloudformation/ml-stack-lambda.yml}"
 # Optional CloudFormation parameters.
 PARAMETERS=(
   "ParameterKey=Environment,ParameterValue=dev"
