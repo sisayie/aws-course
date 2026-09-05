@@ -46,7 +46,7 @@ Set Up an AWS Application Load Balancer
 - a VPC with at least **two subnets in different Availability Zones**
 - two running EC2 instances
 
- > **Cost note:** AWS resources created during this exercise may incur charges. Delete the resources when you are finished.
+ > **Cost note:** AWS resources created during this exercise may incur charges. Delete the resources when you are finished. [Reade here for more infomation on the costs](https://aws.amazon.com/elasticloadbalancing/pricing/)
 
  ## Task
 
@@ -86,7 +86,9 @@ Set Up an AWS Application Load Balancer
 
  The ALB should be the public entry point to your application.
 
- <details> <summary>Show hint<summary> Users should connect to the ALB, not directly to the EC2 instances.
+ <details> 
+ <summary>Show hint</summary> 
+ Users should connect to the ALB, not directly to the EC2 instances.
 
  The traffic flow should look like:
 
@@ -101,11 +103,15 @@ Application Load Balancer
    +--------> EC2 Instance 2
 ```
 
- </details> ## 💡 Hint 2
+ </details> 
+ 
+ ## 💡 Hint 2
 
  Your EC2 instances should not need to accept HTTP traffic from everywhere.
 
- <details> <summary>Show hint<summary> Instead of allowing:
+ <details> 
+ <summary>Show hint</summary> 
+ Instead of allowing:
 
 ```
 0.0.0.0/0 → TCP 80
@@ -125,11 +131,15 @@ Internet → ALB → EC2
 Internet → EC2
 ```
 
- <details> ## 💡 Hint 3
+ </details> 
+ 
+ ## 💡 Hint 3
 
  A target can be registered but still be unusable.
 
- <details> <summary>Show hint<summary> Check the target group's **Health status**.
+ <details> 
+ <summary>Show hint</summary> 
+ Check the target group's **Health status**.
 
  If a target is unhealthy, verify:
 
@@ -139,7 +149,9 @@ Internet → EC2
 - the EC2 security group allows traffic from the ALB security group
 - the instance is in a reachable subnet
 
- <details> ## Challenge
+ </details> 
+ 
+ ## Challenge
 
  Once the basic setup works, try the following:
 
@@ -176,12 +188,13 @@ Hello from Server 2
 - [ ] The EC2 instances do not need to allow HTTP traffic from the entire internet.
 - [ ] The application remains available when one healthy target is stopped.
 - [ ] The stopped instance is eventually reported as unhealthy.
+- [ ] The stopped instance is reported as healthy again and started serving.
 
  ## Clean up
 
- When you are finished, remove the AWS resources you created for this exercise to avoid unnecessary charges.
+ When you are finished, remove the AWS resources you created for this exercise to avoid unnecessary charges. The sandbox will take care of the cleaning but it is good to develop the habit as part of the exercises.
 
- At minimum, check whether you still have:
+ At minimum, make sure to remove:
 
  - the Application Load Balancer
 - the target group
@@ -189,8 +202,8 @@ Hello from Server 2
 - unused security groups
 - other resources created specifically for the exercise
 
- ## 🏁 Done?
+ <!--## 🏁 Done?
 
- <!--Once your ALB successfully routes traffic to healthy EC2 instances:
+ Once your ALB successfully routes traffic to healthy EC2 instances:
 
  ➡️ Continue to **Exercise 04**-->
