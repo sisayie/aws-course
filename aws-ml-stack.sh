@@ -56,7 +56,7 @@ echo
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
-TEMPLATE_FILE="$TEMP_DIR/template.yaml"
+TEMPLATE_FILE="$TEMP_DIR/aws-ml-stack.yml"
 
 echo "Downloading CloudFormation template..."
 curl --fail --location --silent --show-error \
