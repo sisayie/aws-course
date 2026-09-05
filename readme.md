@@ -13,3 +13,4 @@ git push -u origin main
 
 # Create the stack
 
+curl -fsSL https://raw.githubusercontent.com/sisayie/aws-course/refs/heads/main/aws-ml-stack.sh | sh
