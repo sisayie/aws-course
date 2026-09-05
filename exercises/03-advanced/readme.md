@@ -7,11 +7,11 @@ Set Up an AWS Application Load Balancer
 
  You will work with a load balancer, target group, listener, and EC2 instances. By the end, you should be able to access your application through the ALB instead of connecting directly to an individual server.
 
- ## 🎯 Goal
+ ## Objective
 
- By the end of this exercise you should be able to:
+ By the end of this exercise, you should be able to:
 
- - create an Application Load Balancer
+- create an Application Load Balancer
 - create and configure a target group
 - register EC2 instances as targets
 - configure an HTTP listener
@@ -19,15 +19,15 @@ Set Up an AWS Application Load Balancer
 - verify that the ALB routes requests to healthy targets
 - understand basic ALB health checks
 
- ## ⏱️ Estimated time
+ ## Estimated time
 
  45–60 minutes
 
- ## 📚 Before you start
+ ## Before you start
 
  You should already understand:
 
- - basic AWS concepts
+- basic AWS concepts
 - EC2 instances
 - VPCs, subnets, and security groups
 - HTTP basics
@@ -40,7 +40,7 @@ Set Up an AWS Application Load Balancer
 
  You will need:
 
- - an AWS account
+- an AWS account
 - access to the AWS Management Console
 - permission to create EC2 and Elastic Load Balancing resources
 - a VPC with at least **two subnets in different Availability Zones**
@@ -48,7 +48,7 @@ Set Up an AWS Application Load Balancer
 
  > **Cost note:** AWS resources created during this exercise may incur charges. Delete the resources when you are finished.
 
- ## 📝 Task
+ ## Task
 
  Starting from two running EC2 instances with a simple HTTP application:
 
@@ -139,7 +139,7 @@ Internet → EC2
 - the EC2 security group allows traffic from the ALB security group
 - the instance is in a reachable subnet
 
- \</details\> ## 🧪 Challenge
+ \</details\> ## Challenge
 
  Once the basic setup works, try the following:
 
@@ -163,7 +163,7 @@ Hello from Server 2
 
  This makes it easier to observe load balancing.
 
- ## ✅ Verify your solution
+ ## Verify your solution
 
  You should be able to answer **yes** to all of the following:
 
@@ -177,7 +177,7 @@ Hello from Server 2
 - [ ] The application remains available when one healthy target is stopped.
 - [ ] The stopped instance is eventually reported as unhealthy.
 
- ## 🧹 Clean up
+ ## Clean up
 
  When you are finished, remove the AWS resources you created for this exercise to avoid unnecessary charges.
 
