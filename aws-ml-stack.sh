@@ -9,6 +9,9 @@ set -euo pipefail
 AWS_REGION="${AWS_REGION:-us-east-1}"
 STACK_NAME="${STACK_NAME:-ml-stack}"
 
+# AWS Credentials Configuration
+aws configure 
+
 # GitHub raw URL to the CloudFormation template.
 TEMPLATE_URL="${TEMPLATE_URL:-https://raw.githubusercontent.com/ORG/REPO/main/cloudformation/template.yaml}"
 
