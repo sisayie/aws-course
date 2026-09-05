@@ -17,6 +17,9 @@ curl -fsSL https://raw.githubusercontent.com/sisayie/aws-course/refs/heads/main/
 
 If it fails to run because of `\r`, add a `.gitattributes` file to the repository:
 
+Remove the `\r` using the following command
+`sed -i 's/\r$//' aws-ml-stack.sh`
+
  .gitattributes✓
 
 ```
