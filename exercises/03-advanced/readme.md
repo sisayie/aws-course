@@ -7,7 +7,7 @@ Set Up an AWS Application Load Balancer
 
  You will work with a load balancer, target group, listener, and EC2 instances. By the end, you should be able to access your application through the ALB instead of connecting directly to an individual server.
 
- ## Objective
+ ## Objectives
 
  By the end of this exercise, you should be able to:
 
@@ -21,7 +21,7 @@ Set Up an AWS Application Load Balancer
 
  ## Estimated time
 
- 45–60 minutes
+ `45–60 minutes`
 
  ## Before you start
 
@@ -86,7 +86,7 @@ Set Up an AWS Application Load Balancer
 
  The ALB should be the public entry point to your application.
 
- \<details\> \<summary\>Show hint\</summary\> Users should connect to the ALB, not directly to the EC2 instances.
+ <details> <summary>Show hint<summary> Users should connect to the ALB, not directly to the EC2 instances.
 
  The traffic flow should look like:
 
@@ -101,11 +101,11 @@ Application Load Balancer
    +--------> EC2 Instance 2
 ```
 
- \</details\> ## 💡 Hint 2
+ </details> ## 💡 Hint 2
 
  Your EC2 instances should not need to accept HTTP traffic from everywhere.
 
- \<details\> \<summary\>Show hint\</summary\> Instead of allowing:
+ <details> <summary>Show hint<summary> Instead of allowing:
 
 ```
 0.0.0.0/0 → TCP 80
@@ -125,11 +125,11 @@ Internet → ALB → EC2
 Internet → EC2
 ```
 
- \</details\> ## 💡 Hint 3
+ <details> ## 💡 Hint 3
 
  A target can be registered but still be unusable.
 
- \<details\> \<summary\>Show hint\</summary\> Check the target group's **Health status**.
+ <details> <summary>Show hint<summary> Check the target group's **Health status**.
 
  If a target is unhealthy, verify:
 
@@ -139,7 +139,7 @@ Internet → EC2
 - the EC2 security group allows traffic from the ALB security group
 - the instance is in a reachable subnet
 
- \</details\> ## Challenge
+ <details> ## Challenge
 
  Once the basic setup works, try the following:
 
