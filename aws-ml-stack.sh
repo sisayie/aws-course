@@ -10,7 +10,8 @@ AWS_REGION="${AWS_REGION:-us-east-1}"
 STACK_NAME="${STACK_NAME:-ml-stack}"
 
 # AWS Credentials Configuration
-#aws configure 
+# use /dev/tty to force it to read from the terminal. But it is not recommended to put aws configure into an automated deployment script. It makes the script difficult to use in CI/CD and can accidentally expose credentials in logs or shell history. 
+aws configure </dev/tty 
 
 # GitHub raw URL to the CloudFormation template.
 #TEMPLATE_URL="${TEMPLATE_URL:-https://raw.githubusercontent.com/ORG/REPO/main/cloudformation/template.yaml}"

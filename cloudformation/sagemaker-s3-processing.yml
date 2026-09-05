@@ -454,3 +454,16 @@ Outputs:
   SageMakerExecutionRole:
     Description: SageMaker execution role
     Value: !GetAtt SageMakerExecutionRole.Arn
+
+# Output should look something like this:
+# +---------------------------------------------------+-------------------------+-------------------------------------------------------------------------------+
+# |                    Description                    |        OutputKey        |                                  OutputValue                                  |
+# +---------------------------------------------------+-------------------------+-------------------------------------------------------------------------------+
+# |  SageMaker execution role                         |  SageMakerExecutionRole |  arn:aws:iam::654654398537:role/ml-stack-SageMakerExecutionRole-jRw5DQa3Fs2N  |
+# |  Upload raw data here                             |  IncomingPrefix         |  s3://ml-stack-databucket-fn7nww3syesj/incoming/                              |
+# |  S3 bucket used by the pipeline                   |  DataBucketName         |  ml-stack-databucket-fn7nww3syesj                                             |
+# |  Upload preprocess.py here                        |  CodePrefix             |  s3://ml-stack-databucket-fn7nww3syesj/code/                                  |
+# |  Lambda function that starts SageMaker Processing |  LambdaFunction         |  ml-stack-ProcessingLambda-vBFvZghwH9l9                                       |
+# |  Processed data appears here                      |  ProcessedPrefix        |  s3://ml-stack-databucket-fn7nww3syesj/processed/                             |
+# |  EventBridge rule monitoring S3                   |  EventBridgeRule        |  ml-stack-S3ObjectCreatedRule-KaqTW6KY8Fx9                                    |
+# +---------------------------------------------------+-------------------------+-------------------------------------------------------------------------------+
