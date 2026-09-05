@@ -12,29 +12,41 @@ git push -u origin main
 ```
 ---
 
-# Create the stack
 
-curl -fsSL https://raw.githubusercontent.com/sisayie/aws-course/refs/heads/main/aws-ml-stack.sh | bash
+Welcome!
 
-If it fails to run because of `\r`, add a `.gitattributes` file to the repository:
+This repository contains everything you need for the training.
 
-Remove the `\r` using the following command
-`sed -i 's/\r$//' aws-ml-stack.sh`
+## 🚀 Getting started
 
- .gitattributes✓
+1. Clone the repository
+2. Install the dependencies
+3. Run the application
+4. Complete Exercise 01
 
-```
-*.sh text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
-```
+## 🧭 Training path
 
- Then normalize the existing file:
+| Exercise | Topic | Difficulty | Status |
+| ---|  ---| ---|---|
+| 01 | Introduction | 🟢 | ⬜ |
+| 02 | Basic concepts | 🟢 | ⬜ |
+| 03 | Working with X | 🟡 | ⬜ |
+| 04 | Advanced X | 🟡 | ⬜ |
+| 05 | Final challenge | 🔴 | ⬜ |
 
-```
-git add --renormalize .
-git commit -m "Normalize shell scripts to LF"
-git push
-```
+## How exercises work
 
- This prevents Git from checking the shell script out with Windows-style `CRLF` line endings.
+Each exercise contains:
+
+- 📖 Background
+- 🎯 Learning objectives
+- 📝 Tasks
+- 💡 Hints
+- ✅ How to verify your solution
+- 🧑‍🏫 Solution
+
+Start here:
+
+➡️ [Exercise 01](./exercises/01-basics/)
+
+
