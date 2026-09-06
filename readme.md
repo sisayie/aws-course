@@ -1,5 +1,5 @@
-# aws-course
-
+# AWS Course
+<!--
 # Create a Github repository
 ```
 echo "# aws-course" >> readme.md
@@ -35,18 +35,25 @@ This repository contains everything you need for the training.
 | 05 | Final challenge | 🔴 | ⬜ |
 
 ## How exercises work
+-->
+The exercise contains:
 
-Each exercise contains:
+- Background
+- Learning objectives
+- Tasks
+-  Hints💡
+- How to verify your solution
+- Solution
 
-- 📖 Background
-- 🎯 Learning objectives
-- 📝 Tasks
-- 💡 Hints
-- ✅ How to verify your solution
-- 🧑‍🏫 Solution
+<pre style="background:#300a24">
+user@ubuntu:~$ sudo apt update
+Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
+Reading package lists... Done
+user@ubuntu:~$
+</pre>
 
-Start here:
+<!--Start here:
 
 ➡️ [Exercise 01](./exercises/01-basics/)
-
+-->
 
