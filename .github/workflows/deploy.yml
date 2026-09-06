@@ -25,11 +25,10 @@ jobs:
       - name: Build PDF
         run: |
           mkdir -p build
-          TEXINPUTS="$GITHUB_WORKSPACE/templates:" \
           pandoc main.md \
             --from markdown \
             --to beamer \
-            --template=mytemplate.tex \\
+            --template=../template/mytemplate.tex \\
             --output build/slides.pdf
 
       - name: Upload PDF
