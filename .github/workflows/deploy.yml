@@ -1,0 +1,37 @@
+name: Build Beamer Slides
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc and LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            pandoc \
+            texlive-latex-recommended \
+            texlive-latex-extra \
+            texlive-fonts-recommended
+
+      - name: Build PDF
+        run: |
+          mkdir -p build
+          pandoc main.md \
+            --from markdown \
+            --to beamer \
+            --output build/slides.pdf
+
+      - name: Upload PDF
+        uses: actions/upload-artifact@v4
+        with:
+          name: beamer-slides
+          path: build/slides.pdf
