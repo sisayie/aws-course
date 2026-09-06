@@ -45,13 +45,6 @@ The exercise contains:
 - How to verify your solution
 - Solution
 
-<pre style="background:#300a24">
-user@ubuntu:~$ sudo apt update
-Hit:1 http://archive.ubuntu.com/ubuntu noble InRelease
-Reading package lists... Done
-user@ubuntu:~$
-</pre>
-
 <!--Start here:
 
 ➡️ [Exercise 01](./exercises/01-basics/)
