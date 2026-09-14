@@ -36,6 +36,7 @@ This repository contains everything you need for the training.
 
 ## How exercises work
 -->
+<!--
 The exercise contains:
 
 - Background
@@ -44,7 +45,7 @@ The exercise contains:
 -  Hints💡
 - How to verify your solution
 - Solution
-
+-->
 <!--Start here:
 
 ➡️ [Exercise 01](./exercises/01-basics/)
