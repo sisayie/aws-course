@@ -1,4 +1,7 @@
 # Project Structure
+
+```
+
 fraud-sagemaker-mlops/
 │
 ├── README.md
@@ -16,8 +19,11 @@ fraud-sagemaker-mlops/
 │   └── inference.py
 │
 ├── deployment/
-│   └── deploy_endpoint.py
+│   └── deploy\_endpoint.py
 │
 └── data/
-    └── raw
-        └── fraud_transactions_dataset.csv
+└── raw
+└── fraud\_transactions\_dataset.csv
+
+```
+
