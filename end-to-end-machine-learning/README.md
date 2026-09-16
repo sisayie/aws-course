@@ -19,11 +19,11 @@ fraud-sagemaker-mlops/
 │   └── inference.py
 │
 ├── deployment/
-│   └── deploy\_endpoint.py
+│   └── deploy_endpoint.py
 │
 └── data/
-└── raw
-└── fraud\_transactions\_dataset.csv
+	└── raw
+		└── fraud_transactions_dataset.csv
 
 ```
 
