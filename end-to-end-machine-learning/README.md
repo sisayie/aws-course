@@ -32,8 +32,11 @@ fraud-sagemaker-mlops/
 ## Testing the endpoint 
 
 Tesiting the endpoint did not work because of the data format of the test input.
+- do the number of features in train and test match?
+- do the features and their order in trani/test match?
+- is the input in the correct format that the endpoint/model expects? E.g., if endpoint expects csv and you input json?
 
-You may use the following code in your troubleshooting
+You may use the following code in your troubleshooting?
 
 ```python
 import pandas as pd
