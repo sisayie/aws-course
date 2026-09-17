@@ -1,7 +1,7 @@
 Exercise
 ========
 
-Use data from public repositories such as tensorflow.org to build end-to-end ML using SageMaker. For example, let us use [wine quality dataset](https://www.tensorflow.org/datasets/catalog/wine_quality) to perform the following:
+Use data from public repositories such as tensorflow.org or Kaggle.com to build end-to-end ML using SageMaker. For example, you can use [wine quality dataset](https://www.tensorflow.org/datasets/catalog/wine_quality) for classification or [Hause price prediction](www.kaggle.com/competitions/home-data-for-ml-course/overview/citation) for regression.
 
 # Create preprocessing step
 # Create training step
