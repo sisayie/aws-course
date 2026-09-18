@@ -51,10 +51,16 @@ print("\nTest columns:")
 print(test_df.columns.tolist())
 ```
 See also the following images:
+## Is the command compatible to the version?
 ![The command is expecting data in binary format and got string](troubleshooting/troubleshooting_endpoint_1.png)
 ![Fix by adding a parameter](troubleshooting/troubleshooting_endpoint_2.png)
+
+## Inspect features in train and test
 ![The number of features in train and test match](troubleshooting/troubleshooting_endpoint_3.png)
 ![List columns in train and test, and inspect them](troubleshooting/troubleshooting_endpoint_4.png)
-![Is the target class present in the test?](troubleshooting/troubleshooting_endpoint_5.png)
-![Are the columns in train and test in the same order?](troubleshooting/troubleshooting_endpoint_6.png)
 
+## Make sure the target class is not present in test
+![Is the target class present in the test?](troubleshooting/troubleshooting_endpoint_5.png)
+
+## Check the order of the features in train and test
+![Are the columns in train and test in the same order?](troubleshooting/troubleshooting_endpoint_6.png)
